@@ -1,23 +1,25 @@
 local fb_actions = require('snacks-file-browser.actions')
 
----@class snacks.file_browser.Config: snacks.picker.files.Config
----@field defaut_opts snacks.picker.file_browser.Config
----@field fd_args fun(opts: snacks.picker.file_browser.Config): table<string>
 local M = {}
 
-M.defaut_opts = {
+---@type snacks.picker.file_browser.Config
+M.fb_source = {
   title = 'File browser',
   format = 'file',
   finder = 'files',
-  supports_live = true,
+  supports_live = false,
   layout = 'ivy',
   matcher = {
     sort_empty = true,
   },
   -- cmd = "fd",
   -- args = fd_args(opts),
+
+  -- Custom options
   depth = 1,
   add_dirs = true,
+  prompt_prefix = true,
+
   sort = function(a, b)
     local a_is_dir = a and a.type == 'directory'
     local b_is_dir = b and b.type == 'directory'
@@ -36,7 +38,7 @@ M.defaut_opts = {
   end,
   transform = function(item)
     local path = item.cwd .. '/' .. item.file
-    local item_stat = vim.loop.fs_stat(path)
+    local item_stat = vim.uv.fs_stat(path)
 
     if item_stat then
       item.type = item_stat.type
@@ -49,7 +51,7 @@ M.defaut_opts = {
     end
   end,
   confirm = function(picker, item)
-    local item_path = vim.loop.fs_realpath(item.file)
+    local item_path = vim.uv.fs_realpath(item.file)
 
     if item.type == 'file' then
       picker:close()
@@ -69,12 +71,15 @@ M.defaut_opts = {
       keys = {
         ['<c-w>'] = { 'goto_parent', mode = { 'i', 'n' } },
         ['<c-u>'] = { 'clear_prompt_or_goto_cwd', mode = { 'i', 'n' } },
-        ['<bs>'] = { 'backspace', mode = { 'i', 'n' } },
+        ['<bs>'] = { 'backspace', mode = { 'i', 'n' } }, -- FIXME: on first run <bs> is overritten with autopairs
       },
     },
   },
 }
 
+---Generate fd cmd args
+---@param opts snacks.picker.file_browser.Config
+---@return table<string>
 function M.fd_args(opts)
   local args = {}
   if opts.absolute then
@@ -107,5 +112,9 @@ end
 ---@class snacks.picker.file_browser.Config: snacks.picker.files.Config
 ---@field depth? number
 ---@field add_dirs? boolean
+---@field prompt_prefix? boolean
+---@field format? string
+---@field finder? string
+---@field supports_live? boolean
 
 return M

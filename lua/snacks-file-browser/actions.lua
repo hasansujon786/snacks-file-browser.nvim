@@ -1,12 +1,15 @@
-local update_statuscolumn = function(win, cwd)
-  local function add(str, hl)
-    if str then
-      return ('%%#%s#%s%%*'):format(hl, str:gsub('%%', '%%'))
-    end
-  end
+local util = require('snacks-file-browser.util')
 
-  local sc = add(cwd .. '/', 'SnacksPickerPrompt')
-  Snacks.util.wo(win, { statuscolumn = sc })
+---Change picker cwd
+---@param cwd string
+---@param picker snacks.Picker
+local function change_cwd(cwd, picker)
+  picker:set_cwd(cwd)
+  picker:find({ refresh = true })
+
+  if picker.opts.prompt_prefix then
+    util.update_prompt(picker.input.win.win, picker:cwd())
+  end
 end
 
 ----@class snacks.picker.actions
@@ -21,7 +24,7 @@ local actions = {
     end
   end,
   goto_parent = function(picker, _)
-    local cwd = vim.loop.fs_realpath(picker:cwd())
+    local cwd = vim.uv.fs_realpath(picker:cwd())
     if not cwd or cwd == '' then
       return
     end
@@ -31,11 +34,8 @@ local actions = {
       return
     end
 
-    picker:set_cwd(new_cwd)
     picker.input:set('')
-    -- update_statuscolumn(picker.input.win.win, picker:cwd())
-
-    picker:find({ refresh = true })
+    change_cwd(new_cwd, picker)
   end,
   clear_prompt_or_goto_cwd = function(picker)
     local prompt_text = picker.input:get()
@@ -51,14 +51,13 @@ local actions = {
         return
       end
 
-      picker:set_cwd(cwd)
-      picker:find({ refresh = true })
+      change_cwd(cwd, picker)
     else
       vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<C-u>', true, false, true), 'tn', false)
     end
   end,
   -- cd = function(picker, selected)
-  --   cwd = vim.loop.fs_realpath(cwd .. '/' .. selected.file)
+  --   cwd = vim.uv.fs_realpath(cwd .. '/' .. selected.file)
   --   vim.cmd('tcd ' .. cwd)
   --   picker:find()
   -- end,
