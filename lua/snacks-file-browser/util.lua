@@ -59,7 +59,7 @@ end
 ---Replace input prompt with cwd
 ---@param win number
 ---@param picker_cwd string
-M.update_prompt = function(win, picker_cwd)
+function M.update_prompt(win, picker_cwd)
   local function add(str, hl)
     if str then
       return ('%%#%s#%s%%*'):format(hl, str:gsub('%%', '%%'))
@@ -68,6 +68,18 @@ M.update_prompt = function(win, picker_cwd)
 
   local sc = add(M.get_prompt_prefix(picker_cwd), 'SnacksPickerPrompt')
   Snacks.util.wo(win, { statuscolumn = sc })
+end
+
+---Change picker cwd
+---@param cwd string
+---@param picker snacks.Picker
+function M.change_picker_cwd(cwd, picker)
+  picker:set_cwd(cwd)
+  picker:find({ refresh = true })
+
+  if picker.opts.prompt_prefix then
+    M.update_prompt(picker.input.win.win, picker:cwd())
+  end
 end
 
 return M

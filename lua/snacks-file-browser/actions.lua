@@ -1,17 +1,5 @@
 local util = require('snacks-file-browser.util')
 
----Change picker cwd
----@param cwd string
----@param picker snacks.Picker
-local function change_cwd(cwd, picker)
-  picker:set_cwd(cwd)
-  picker:find({ refresh = true })
-
-  if picker.opts.prompt_prefix then
-    util.update_prompt(picker.input.win.win, picker:cwd())
-  end
-end
-
 ----@class snacks.picker.actions
 ---@type table<string, snacks.picker.Action.spec> actions used by keymaps
 local actions = {
@@ -35,7 +23,7 @@ local actions = {
     end
 
     picker.input:set('')
-    change_cwd(new_cwd, picker)
+    util.change_picker_cwd(new_cwd, picker)
   end,
   clear_prompt_or_goto_cwd = function(picker)
     local prompt_text = picker.input:get()
@@ -51,7 +39,7 @@ local actions = {
         return
       end
 
-      change_cwd(cwd, picker)
+      util.change_picker_cwd(cwd, picker)
     else
       vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<C-u>', true, false, true), 'tn', false)
     end

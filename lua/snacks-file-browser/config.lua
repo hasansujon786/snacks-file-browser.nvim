@@ -1,4 +1,5 @@
 local fb_actions = require('snacks-file-browser.actions')
+local util = require('snacks-file-browser.util')
 
 local M = {}
 
@@ -57,10 +58,8 @@ M.fb_source = {
       picker:close()
       vim.cmd.edit(item_path)
     elseif item.type == 'directory' then
-      picker:set_cwd(item_path)
       picker.input:set('')
-      picker:find({ refresh = true })
-      picker:update()
+      util.change_picker_cwd(item_path, picker)
     end
 
     -- end
@@ -70,8 +69,9 @@ M.fb_source = {
     input = {
       keys = {
         ['<c-w>'] = { 'goto_parent', mode = { 'i', 'n' } },
-        ['<c-u>'] = { 'clear_prompt_or_goto_cwd', mode = { 'i', 'n' } },
-        ['<bs>'] = { 'backspace', mode = { 'i', 'n' } }, -- FIXME: on first run <bs> is overritten with autopairs
+        ['<c-u>'] = { 'clear_prompt_or_goto_cwd', mode = { 'i' } },
+        ['<bs>'] = { 'backspace', mode = { 'i', 'n' } },
+        ['<tab>'] = { 'confirm', mode = { 'i', 'n' } },
       },
     },
   },
