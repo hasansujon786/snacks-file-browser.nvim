@@ -43,6 +43,11 @@ function M.make_path_relative(base, path)
 end
 
 function M.get_prompt_prefix(picker_cwd)
+  -- Specifically, if the cwd key is not provided by the user.
+  if not picker_cwd then
+    return './'
+  end
+
   local cwd = vim.fs.normalize(vim.uv.cwd())
   picker_cwd = vim.fs.normalize(picker_cwd)
   local path, is_relative = M.make_path_relative(cwd, picker_cwd)

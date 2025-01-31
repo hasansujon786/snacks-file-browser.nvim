@@ -8,10 +8,11 @@ local M = {}
 local defaults
 
 ---Open file_browser picker
----@param opts snacks.picker.file_browser.Config
+---@param opts? snacks.picker.file_browser.Config
 function M.browse(opts)
   if not defaults then
-    defaults = vim.tbl_deep_extend('force', config.fb_source, Picker.config.get().sources['file_browser'] or {})
+    defaults =
+      vim.tbl_deep_extend('force', config.fb_source, Picker.config.get().sources[config.fb_source.source] or {})
   end
   opts = vim.tbl_deep_extend('force', defaults, opts or {})
 
@@ -19,10 +20,10 @@ function M.browse(opts)
   opts.args = config.fd_args(opts)
 
   if opts.prompt_prefix then
-    opts.prompt = util.get_prompt_prefix(vim.uv.fs_realpath(opts.cwd))
+    opts.prompt = util.get_prompt_prefix(opts.cwd and vim.uv.fs_realpath(opts.cwd))
   end
 
-  Picker.files(opts)
+  Picker.pick(opts)
 end
 
 return M

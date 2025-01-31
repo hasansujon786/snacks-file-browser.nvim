@@ -5,9 +5,18 @@ local M = {}
 
 ---@type snacks.picker.file_browser.Config
 M.fb_source = {
+  ---@type table<string, string|false|snacks.picker.toggle>
+  toggles = {
+    follow = 'f',
+    hidden = 'h',
+    ignored = 'i',
+    modified = 'm',
+    regex = { icon = 'R', value = false },
+  },
   title = 'File browser',
   format = 'file',
   finder = 'files',
+  source = 'file_browser',
   supports_live = false,
   layout = 'ivy',
   matcher = {
@@ -16,7 +25,7 @@ M.fb_source = {
   -- cmd = "fd",
   -- args = fd_args(opts),
 
-  -- Custom options
+  -- file_browser specific opts
   depth = 1,
   add_dirs = true,
   prompt_prefix = true,
@@ -68,10 +77,9 @@ M.fb_source = {
   win = {
     input = {
       keys = {
-        ['<c-w>'] = { 'goto_parent', mode = { 'i', 'n' } },
+        ['<c-t>'] = { 'goto_parent', mode = { 'i', 'n' } },
         ['<c-u>'] = { 'clear_prompt_or_goto_cwd', mode = { 'i' } },
         ['<bs>'] = { 'backspace', mode = { 'i', 'n' } },
-        ['<tab>'] = { 'confirm', mode = { 'i', 'n' } },
       },
     },
   },
