@@ -14,6 +14,7 @@ M.fb_source = {
     regex = { icon = 'R', value = false },
   },
   title = 'File browser',
+  show_empty = true,
   format = 'file',
   finder = 'files',
   source = 'file_browser',
@@ -105,7 +106,7 @@ function M.fd_args(opts)
   -- if hidden_opts(opts) then
   --   table.insert(args, '--hidden')
   -- end
-  if not opts.respect_gitignore then
+  if opts.respect_gitignore == false then
     table.insert(args, '--no-ignore-vcs')
   end
   if opts.no_ignore then
