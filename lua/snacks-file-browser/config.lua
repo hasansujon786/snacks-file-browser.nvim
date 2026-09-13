@@ -81,6 +81,7 @@ M.fb_source = {
         ['<c-t>'] = { 'goto_parent', mode = { 'i', 'n' } },
         ['<c-u>'] = { 'clear_prompt_or_goto_cwd', mode = { 'i' } },
         ['<bs>'] = { 'backspace', mode = { 'i', 'n' } },
+        ['<tab>'] = { 'enter', mode = { 'i' } },
       },
     },
   },

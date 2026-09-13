@@ -44,11 +44,17 @@ local actions = {
       vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<C-u>', true, false, true), 'tn', false)
     end
   end,
-  -- cd = function(picker, selected)
-  --   cwd = vim.uv.fs_realpath(cwd .. '/' .. selected.file)
-  --   vim.cmd('tcd ' .. cwd)
-  --   picker:find()
-  -- end,
+  enter = function(picker, item)
+    local item_path = vim.uv.fs_realpath(item.file)
+
+    if item.type == 'file' then
+      picker:close()
+      vim.cmd.edit(item_path)
+    elseif item.type == 'directory' then
+      picker.input:set('')
+      util.change_picker_cwd(item_path, picker)
+    end
+  end,
 }
 
 return actions

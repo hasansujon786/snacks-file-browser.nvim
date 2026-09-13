@@ -81,6 +81,21 @@ M.select_dir = function()
       end, 400)
       M.browse({ cwd = item.file, show_empty = true })
     end,
+    actions = {
+      confirm = function(picker, item)
+        vim.defer_fn(function()
+          picker:close()
+        end, 400)
+        M.browse({ cwd = item.file, show_empty = true })
+      end,
+    },
+    win = {
+      input = {
+        keys = {
+          ['<tab>'] = { 'confirm', mode = { 'i' } },
+        },
+      },
+    },
   })
 end
 
