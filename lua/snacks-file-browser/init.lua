@@ -5,18 +5,19 @@ local util = require('snacks-file-browser.util')
 local M = {}
 
 ---@type snacks.picker.file_browser.Config
-local defaults
+local defaults_config
 local function get_defaults()
-  defaults = vim.tbl_deep_extend('force', config.fb_source, Picker.config.get().sources[config.fb_source.source] or {})
+  defaults_config =
+    vim.tbl_deep_extend('force', config.fb_source, Picker.config.get().sources[config.fb_source.source] or {})
 end
 
 ---Open file_browser picker
 ---@param opts? snacks.picker.file_browser.Config
 function M.browse(opts)
-  if not defaults then
+  if not defaults_config then
     get_defaults()
   end
-  opts = vim.tbl_deep_extend('force', defaults, opts or {})
+  opts = vim.tbl_deep_extend('force', defaults_config, opts or {})
 
   opts.cmd = 'fd'
   opts.args = config.fd_args(opts)
@@ -55,18 +56,19 @@ local function get_directories(cmd)
   return directories
 end
 
-M.select_dir = function()
-  if not defaults then
+---@param opts? snacks.picker.file_browser.Config
+M.select_dir = function(opts)
+  if not defaults_config then
     get_defaults()
   end
 
-  return Picker.pick({
+  local picker_opts = {
     title = 'Select dir to browse',
-    layout = defaults.layout,
-    finder = function(opts, ctx)
+    layout = defaults_config.layout,
+    finder = function(finder_opts, ctx)
       local dirs = get_directories(get_cmd({
         args = { 'fd', '--type', 'directory', '--type', 'symlink', '--color', 'never', '-E', '.git' },
-        exclude = opts.exclude or {},
+        exclude = finder_opts.exclude or {},
       }))
 
       local items = {}
@@ -96,7 +98,11 @@ M.select_dir = function()
         },
       },
     },
-  })
+  }
+
+  local final_opts = vim.tbl_deep_extend('force', picker_opts, opts or {})
+
+  return Picker.pick(final_opts)
 end
 
 return M
